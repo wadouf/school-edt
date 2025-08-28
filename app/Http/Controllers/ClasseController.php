@@ -79,8 +79,8 @@ class ClasseController extends Controller
             'filiere_id' => 'required|exists:filieres,id',
             'nom' => 'required|string|max:255',
             'code' => 'nullable|string|max:10|unique:classes,code',
-            'effectif_max' => 'nullable|integer|min:1|max:50',
-            'salle_attitre' => 'nullable|string|max:255',
+            'capacite_max' => 'nullable|integer|min:1|max:50',
+            'salle_principale' => 'nullable|string|max:255',
             'actif' => 'boolean',
         ]);
 
@@ -144,8 +144,8 @@ class ClasseController extends Controller
             'filiere_id' => 'required|exists:filieres,id',
             'nom' => 'required|string|max:255',
             'code' => 'nullable|string|max:10|unique:classes,code,' . $classe->id,
-            'effectif_max' => 'nullable|integer|min:1|max:50',
-            'salle_attitre' => 'nullable|string|max:255',
+            'capacite_max' => 'nullable|integer|min:1|max:50',
+            'salle_principale' => 'nullable|string|max:255',
             'actif' => 'boolean',
         ]);
 
@@ -262,8 +262,8 @@ class ClasseController extends Controller
                 'Section',
                 'Niveau',
                 'Filière',
-                'Effectif Max',
-                'Salle Attitré',
+                'Capacité Max',
+                'Salle Principale',
                 'Actif',
                 'Créé le'
             ]);
@@ -277,8 +277,8 @@ class ClasseController extends Controller
                     $classe->section->nom ?? '',
                     $classe->niveau->nom ?? '',
                     $classe->filiere->nom ?? '',
-                    $classe->effectif_max,
-                    $classe->salle_attitre,
+                    $classe->capacite_max,
+                    $classe->salle_principale,
                     $classe->actif ? 'Oui' : 'Non',
                     $classe->created_at->format('d/m/Y H:i')
                 ]);

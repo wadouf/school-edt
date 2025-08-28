@@ -13,7 +13,7 @@ class ClassePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('voir_classes') || 
+        return $user->hasPermissionTo('view_classes') || 
                $user->hasRole(['admin', 'chef']);
     }
 
@@ -22,7 +22,7 @@ class ClassePolicy
      */
     public function view(User $user, Classe $classe): bool
     {
-        return $user->hasPermissionTo('voir_classes') || 
+        return $user->hasPermissionTo('view_classes') || 
                $user->hasRole(['admin', 'chef']);
     }
 
@@ -31,7 +31,7 @@ class ClassePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('creer_classes') || 
+        return $user->hasPermissionTo('create_classes') || 
                $user->hasRole(['admin', 'chef']);
     }
 
@@ -40,7 +40,7 @@ class ClassePolicy
      */
     public function update(User $user, Classe $classe): bool
     {
-        return $user->hasPermissionTo('modifier_classes') || 
+        return $user->hasPermissionTo('edit_classes') || 
                $user->hasRole(['admin', 'chef']);
     }
 
@@ -49,7 +49,7 @@ class ClassePolicy
      */
     public function delete(User $user, Classe $classe): bool
     {
-        return $user->hasPermissionTo('supprimer_classes') || 
+        return $user->hasPermissionTo('delete_classes') || 
                $user->hasRole('admin');
     }
 
