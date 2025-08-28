@@ -1,4 +1,441 @@
-<x-app-layout>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }} - Gestion des Classes</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        
+        <!-- Bootstrap 5 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        
+        <!-- Font Awesome -->
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+
+        <!-- Custom Styles -->
+        <style>
+            :root {
+                --primary-color: #2563eb;
+                --sidebar-width: 280px;
+                --sidebar-collapsed-width: 80px;
+                --header-height: 70px;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background-color: #f8fafc;
+                color: #334155;
+                overflow-x: hidden;
+            }
+
+            /* Sidebar Styles */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: var(--sidebar-width);
+                background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+                transition: all 0.3s ease;
+                z-index: 1000;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.collapsed {
+                width: var(--sidebar-collapsed-width);
+            }
+
+            .sidebar-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .sidebar-logo {
+                display: flex;
+                align-items: center;
+                color: white;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .sidebar-logo .logo-icon {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.2rem;
+                margin-right: 0.75rem;
+                flex-shrink: 0;
+            }
+
+            .sidebar-logo .logo-text h6 {
+                margin: 0;
+                font-weight: 700;
+                font-size: 1.1rem;
+                line-height: 1.2;
+            }
+
+            .sidebar-logo .logo-text small {
+                font-size: 0.75rem;
+                opacity: 0.8;
+            }
+
+            .sidebar.collapsed .logo-text {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+
+            .sidebar-toggle {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 0.25rem;
+                transition: all 0.2s ease;
+            }
+
+            .sidebar-toggle:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            /* Navigation */
+            .sidebar-nav {
+                padding: 1rem 0;
+                height: calc(100vh - 90px);
+                overflow-y: auto;
+            }
+
+            .nav-item {
+                margin: 0 0.75rem 0.25rem;
+            }
+
+            .nav-link {
+                display: flex;
+                align-items: center;
+                padding: 0.875rem 1rem;
+                color: rgba(255, 255, 255, 0.8);
+                text-decoration: none;
+                border-radius: 0.5rem;
+                transition: all 0.2s ease;
+                font-weight: 500;
+            }
+
+            .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                transform: translateX(4px);
+            }
+
+            .nav-link.active {
+                background-color: var(--primary-color);
+                color: white;
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            }
+
+            .nav-link i {
+                width: 20px;
+                font-size: 1.1rem;
+                margin-right: 0.875rem;
+                text-align: center;
+                flex-shrink: 0;
+            }
+
+            .nav-link .nav-text {
+                transition: all 0.3s ease;
+            }
+
+            .sidebar.collapsed .nav-text {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+
+            .nav-section {
+                padding: 0 1.5rem;
+                margin: 1.5rem 0 0.5rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+            .sidebar.collapsed .nav-section {
+                opacity: 0;
+                height: 0;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            /* Main Content */
+            .main-wrapper {
+                margin-left: var(--sidebar-width);
+                transition: all 0.3s ease;
+                min-height: 100vh;
+            }
+
+            .main-wrapper.sidebar-collapsed {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+
+            .top-header {
+                background: white;
+                padding: 1rem 2rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                position: sticky;
+                top: 0;
+                z-index: 999;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: var(--header-height);
+            }
+
+            .user-menu {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.5rem 1rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.5rem;
+                background: white;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                text-decoration: none;
+                color: inherit;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+            .main-content {
+                padding: 2rem;
+                min-height: calc(100vh - var(--header-height));
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .sidebar {
+                    transform: translateX(-100%);
+                }
+
+                .sidebar.show {
+                    transform: translateX(0);
+                }
+
+                .main-wrapper {
+                    margin-left: 0;
+                }
+
+                .main-wrapper.sidebar-collapsed {
+                    margin-left: 0;
+                }
+            }
+
+            /* Cards and components */
+            .card {
+                border: none;
+                border-radius: 0.75rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                transition: all 0.2s ease;
+            }
+
+            .card:hover {
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <a href="{{ route('dashboard') }}" class="sidebar-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h6>Institut Les Pintades</h6>
+                        <small>Gestion EDT</small>
+                    </div>
+                </a>
+                <button class="sidebar-toggle d-none d-md-block" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="{{ route('dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span class="nav-text">Tableau de Bord</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">Gestion</div>
+                
+                @can('viewAny', App\Models\Classe::class)
+                <div class="nav-item">
+                    <a href="{{ route('classes.index') }}" class="nav-link active">
+                        <i class="fas fa-school"></i>
+                        <span class="nav-text">Classes</span>
+                    </a>
+                </div>
+                @endcan
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-text">Enseignants</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-text">Matières</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-door-open"></i>
+                        <span class="nav-text">Salles</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">Emplois du Temps</div>
+                
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="nav-text">Planning</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-clock"></i>
+                        <span class="nav-text">Créneaux Horaires</span>
+                    </a>
+                </div>
+
+                @hasrole('admin')
+                <div class="nav-section">Administration</div>
+                
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span class="nav-text">Utilisateurs</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span class="nav-text">Paramètres</span>
+                    </a>
+                </div>
+                @endhasrole
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-wrapper" id="mainWrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary d-md-none me-3" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h2 class="h4 fw-bold text-dark mb-0">
+                            <i class="fas fa-school text-primary me-2"></i> 
+                            Gestion des Classes
+                        </h2>
+                        @can('create', App\Models\Classe::class)
+                            <a href="{{ route('classes.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i> Nouvelle Classe
+                            </a>
+                        @endcan
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-success">
+                        <i class="fas fa-circle me-1" style="font-size: 0.6em;"></i>
+                        En ligne
+                    </span>
+
+                    <div class="dropdown">
+                        <a href="#" class="user-menu" data-bs-toggle="dropdown">
+                            <div class="user-avatar">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                            </div>
+                            <div class="d-none d-sm-block">
+                                <div class="fw-semibold">{{ Auth::user()->name }}</div>
+                                <small class="text-muted">
+                                    @foreach(Auth::user()->roles as $role)
+                                        {{ ucfirst($role->name) }}
+                                    @endforeach
+                                </small>
+                            </div>
+                            <i class="fas fa-chevron-down ms-2"></i>
+                        </a>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                    <i class="fas fa-user me-2"></i> Mon Profil
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); this.closest('form').submit();">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+                                    </a>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="main-content">
     <x-slot name="header">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="h4 fw-bold text-dark mb-0">
@@ -279,5 +716,48 @@
                 @endif
             </div>
         </div>
-    </div>
-</x-app-layout>
+            </main>
+        </div>
+
+        <!-- Bootstrap 5 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Sidebar Toggle Script -->
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const mainWrapper = document.getElementById('mainWrapper');
+                
+                if (window.innerWidth <= 768) {
+                    // Mobile behavior
+                    sidebar.classList.toggle('show');
+                } else {
+                    // Desktop behavior
+                    sidebar.classList.toggle('collapsed');
+                    mainWrapper.classList.toggle('sidebar-collapsed');
+                }
+            }
+
+            // Close sidebar on mobile when clicking outside
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    const toggleBtn = document.querySelector('.d-md-none');
+                    
+                    if (!sidebar.contains(event.target) && !toggleBtn?.contains(event.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('sidebar');
+                
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        </script>
+    </body>
+</html>

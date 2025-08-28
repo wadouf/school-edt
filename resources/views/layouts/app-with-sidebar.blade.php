@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }} - Admin Dashboard</title>
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +22,13 @@
         <style>
             :root {
                 --primary-color: #2563eb;
+                --secondary-color: #64748b;
+                --success-color: #10b981;
+                --danger-color: #ef4444;
+                --warning-color: #f59e0b;
+                --info-color: #06b6d4;
+                --light-color: #f8fafc;
+                --dark-color: #1e293b;
                 --sidebar-width: 280px;
                 --sidebar-collapsed-width: 80px;
                 --header-height: 70px;
@@ -31,6 +38,7 @@
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
                 background-color: #f8fafc;
                 color: #334155;
+                line-height: 1.6;
                 overflow-x: hidden;
             }
 
@@ -81,6 +89,10 @@
                 flex-shrink: 0;
             }
 
+            .sidebar-logo .logo-text {
+                transition: all 0.3s ease;
+            }
+
             .sidebar-logo .logo-text h6 {
                 margin: 0;
                 font-weight: 700;
@@ -114,11 +126,24 @@
                 background-color: rgba(255, 255, 255, 0.1);
             }
 
-            /* Navigation */
+            /* Navigation Styles */
             .sidebar-nav {
                 padding: 1rem 0;
-                height: calc(100vh - 90px);
+                height: calc(100vh - var(--header-height) - 2rem);
                 overflow-y: auto;
+            }
+
+            .sidebar-nav::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .sidebar-nav::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .sidebar-nav::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 2px;
             }
 
             .nav-item {
@@ -134,6 +159,7 @@
                 border-radius: 0.5rem;
                 transition: all 0.2s ease;
                 font-weight: 500;
+                position: relative;
             }
 
             .nav-link:hover {
@@ -174,6 +200,7 @@
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
                 color: rgba(255, 255, 255, 0.5);
+                transition: all 0.3s ease;
             }
 
             .sidebar.collapsed .nav-section {
@@ -203,9 +230,21 @@
                 top: 0;
                 z-index: 999;
                 display: flex;
-                justify-content: space-between;
+                justify-content: between;
                 align-items: center;
                 min-height: var(--header-height);
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-left: auto;
             }
 
             .user-menu {
@@ -220,6 +259,11 @@
                 cursor: pointer;
                 text-decoration: none;
                 color: inherit;
+            }
+
+            .user-menu:hover {
+                background: #f8fafc;
+                border-color: var(--primary-color);
             }
 
             .user-avatar {
@@ -257,9 +301,25 @@
                 .main-wrapper.sidebar-collapsed {
                     margin-left: 0;
                 }
+
+                .mobile-toggle {
+                    display: block !important;
+                }
             }
 
-            /* Cards and components */
+            @media (min-width: 769px) {
+                .mobile-toggle {
+                    display: none !important;
+                }
+            }
+
+            /* Utility Classes */
+            .badge {
+                border-radius: 50px;
+                font-weight: 500;
+                padding: 0.375rem 0.75rem;
+            }
+
             .card {
                 border: none;
                 border-radius: 0.75rem;
@@ -271,7 +331,53 @@
                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
                 transform: translateY(-2px);
             }
+
+            .btn {
+                border-radius: 0.5rem;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                transition: all 0.2s ease;
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .form-control, .form-select {
+                border-radius: 0.5rem;
+                border: 1px solid #d1d5db;
+                padding: 0.625rem 0.875rem;
+                transition: all 0.2s ease;
+            }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+            }
+
+            .table th {
+                background-color: #f8fafc;
+                border: none;
+                font-weight: 600;
+                color: var(--dark-color);
+                padding: 1rem;
+            }
+
+            .table td {
+                border: none;
+                padding: 0.875rem 1rem;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .alert {
+                border: none;
+                border-radius: 0.75rem;
+                padding: 1rem 1.25rem;
+            }
         </style>
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
         <!-- Sidebar -->
@@ -294,18 +400,20 @@
 
             <!-- Navigation -->
             <nav class="sidebar-nav">
+                <!-- Dashboard -->
                 <div class="nav-item">
-                    <a href="{{ route('dashboard') }}" class="nav-link active">
+                    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home"></i>
                         <span class="nav-text">Tableau de Bord</span>
                     </a>
                 </div>
 
+                <!-- Gestion Section -->
                 <div class="nav-section">Gestion</div>
                 
                 @can('viewAny', App\Models\Classe::class)
                 <div class="nav-item">
-                    <a href="{{ route('classes.index') }}" class="nav-link">
+                    <a href="{{ route('classes.index') }}" class="nav-link {{ request()->routeIs('classes.*') ? 'active' : '' }}">
                         <i class="fas fa-school"></i>
                         <span class="nav-text">Classes</span>
                     </a>
@@ -333,6 +441,7 @@
                     </a>
                 </div>
 
+                <!-- Emplois du Temps Section -->
                 <div class="nav-section">Emplois du Temps</div>
                 
                 <div class="nav-item">
@@ -350,6 +459,7 @@
                 </div>
 
                 @hasrole('admin')
+                <!-- Administration Section -->
                 <div class="nav-section">Administration</div>
                 
                 <div class="nav-item">
@@ -380,23 +490,24 @@
         <div class="main-wrapper" id="mainWrapper">
             <!-- Top Header -->
             <header class="top-header">
-                <div class="d-flex align-items-center">
-                    <button class="btn btn-outline-secondary d-md-none me-3" onclick="toggleSidebar()">
+                <div class="header-left">
+                    <button class="btn btn-outline-secondary mobile-toggle d-md-none me-3" onclick="toggleSidebar()">
                         <i class="fas fa-bars"></i>
                     </button>
                     
-                    <h2 class="h4 fw-bold text-dark mb-0">
-                        <i class="fas fa-user-cog text-primary me-2"></i> 
-                        Tableau de Bord - Administrateur
-                    </h2>
+                    @isset($header)
+                        {{ $header }}
+                    @endisset
                 </div>
 
-                <div class="d-flex align-items-center gap-3">
+                <div class="header-right">
+                    <!-- User Status -->
                     <span class="badge bg-success">
                         <i class="fas fa-circle me-1" style="font-size: 0.6em;"></i>
                         En ligne
                     </span>
 
+                    <!-- User Menu -->
                     <div class="dropdown">
                         <a href="#" class="user-menu" data-bs-toggle="dropdown">
                             <div class="user-avatar">
@@ -436,235 +547,7 @@
 
             <!-- Page Content -->
             <main class="main-content">
-                <!-- Statistiques générales -->
-                <div class="row g-4 mb-4">
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center mb-3">
-                                    <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                                        <i class="fas fa-school text-primary fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="fw-bold text-primary mb-1">{{ $stats['classes'] }}</h3>
-                                <p class="text-muted small mb-0">Classes</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center mb-3">
-                                    <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                        <i class="fas fa-chalkboard-teacher text-success fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="fw-bold text-success mb-1">{{ $stats['enseignants'] }}</h3>
-                                <p class="text-muted small mb-0">Enseignants</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center mb-3">
-                                    <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                                        <i class="fas fa-book text-info fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="fw-bold text-info mb-1">{{ $stats['matieres'] }}</h3>
-                                <p class="text-muted small mb-0">Matières</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center mb-3">
-                                    <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                                        <i class="fas fa-door-open text-warning fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="fw-bold text-warning mb-1">{{ $stats['salles'] }}</h3>
-                                <p class="text-muted small mb-0">Salles</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center mb-3">
-                                    <div class="bg-danger bg-opacity-10 rounded-circle p-3">
-                                        <i class="fas fa-calendar-alt text-danger fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="fw-bold text-danger mb-1">{{ $stats['emplois'] }}</h3>
-                                <p class="text-muted small mb-0">Emplois</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center mb-3">
-                                    <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
-                                        <i class="fas fa-clock text-secondary fs-4"></i>
-                                    </div>
-                                </div>
-                                <h3 class="fw-bold text-secondary mb-1">{{ $stats['creneaux'] }}</h3>
-                                <p class="text-muted small mb-0">Créneaux</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4">
-                    <!-- Gestion Rapide -->
-                    <div class="col-12 col-lg-6">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-header bg-transparent border-0 pb-0">
-                                <h5 class="card-title fw-bold">
-                                    <i class="fas fa-tools text-primary me-2"></i>
-                                    Gestion Rapide
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <a href="#" class="btn btn-outline-primary w-100 py-3">
-                                            <i class="fas fa-users fs-5 d-block mb-2"></i>
-                                            <span class="fw-semibold">Utilisateurs</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <a href="{{ route('classes.index') }}" class="btn btn-outline-success w-100 py-3">
-                                            <i class="fas fa-school fs-5 d-block mb-2"></i>
-                                            <span class="fw-semibold">Classes</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <a href="#" class="btn btn-outline-warning w-100 py-3">
-                                            <i class="fas fa-chalkboard-teacher fs-5 d-block mb-2"></i>
-                                            <span class="fw-semibold">Enseignants</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <a href="#" class="btn btn-outline-info w-100 py-3">
-                                            <i class="fas fa-book fs-5 d-block mb-2"></i>
-                                            <span class="fw-semibold">Matières</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <a href="#" class="btn btn-outline-dark w-100 py-3">
-                                            <i class="fas fa-door-open fs-5 d-block mb-2"></i>
-                                            <span class="fw-semibold">Salles</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <a href="#" class="btn btn-outline-secondary w-100 py-3">
-                                            <i class="fas fa-calendar-alt fs-5 d-block mb-2"></i>
-                                            <span class="fw-semibold">Emplois du Temps</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Activités Récentes -->
-                    <div class="col-12 col-lg-6">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-header bg-transparent border-0 pb-0">
-                                <h5 class="card-title fw-bold">
-                                    <i class="fas fa-history text-primary me-2"></i>
-                                    Activités Récentes
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="activity-feed" style="max-height: 300px; overflow-y: auto;">
-                                    @forelse($recentActivities as $activity)
-                                        <div class="d-flex align-items-start mb-3">
-                                            <div class="flex-shrink-0">
-                                                <div class="bg-primary rounded-circle p-2" style="width: 32px; height: 32px;">
-                                                    <div class="bg-white rounded-circle mx-auto" style="width: 4px; height: 4px;"></div>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <p class="mb-1 small">{{ $activity->description }}</p>
-                                                <small class="text-muted">{{ $activity->created_at->diffForHumans() }}</small>
-                                            </div>
-                                        </div>
-                                    @empty
-                                        <div class="text-center py-4">
-                                            <i class="fas fa-history text-muted fs-1 mb-3"></i>
-                                            <p class="text-muted">Aucune activité récente</p>
-                                        </div>
-                                    @endforelse
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Utilisateurs Récents -->
-                    <div class="col-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-transparent border-0 pb-0">
-                                <h5 class="card-title fw-bold">
-                                    <i class="fas fa-user-plus text-primary me-2"></i>
-                                    Utilisateurs Récents
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th class="fw-semibold">Nom</th>
-                                                <th class="fw-semibold">Email</th>
-                                                <th class="fw-semibold">Rôle</th>
-                                                <th class="fw-semibold">Créé le</th>
-                                                <th class="fw-semibold">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($users as $user)
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                                {{ strtoupper(substr($user->name, 0, 2)) }}
-                                                            </div>
-                                                            <span class="fw-semibold">{{ $user->name }}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-muted">{{ $user->email }}</td>
-                                                    <td>
-                                                        @foreach($user->roles as $role)
-                                                            <span class="badge bg-primary rounded-pill">{{ $role->name }}</span>
-                                                        @endforeach
-                                                    </td>
-                                                    <td class="text-muted">{{ $user->created_at->format('d/m/Y') }}</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="5" class="text-center py-4 text-muted">
-                                                        <i class="fas fa-users fs-1 mb-3 d-block"></i>
-                                                        Aucun utilisateur
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {{ $slot }}
             </main>
         </div>
 
@@ -691,9 +574,9 @@
             document.addEventListener('click', function(event) {
                 if (window.innerWidth <= 768) {
                     const sidebar = document.getElementById('sidebar');
-                    const toggleBtn = document.querySelector('.d-md-none');
+                    const toggle = document.querySelector('.mobile-toggle');
                     
-                    if (!sidebar.contains(event.target) && !toggleBtn?.contains(event.target)) {
+                    if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
                         sidebar.classList.remove('show');
                     }
                 }
@@ -702,6 +585,7 @@
             // Handle window resize
             window.addEventListener('resize', function() {
                 const sidebar = document.getElementById('sidebar');
+                const mainWrapper = document.getElementById('mainWrapper');
                 
                 if (window.innerWidth > 768) {
                     sidebar.classList.remove('show');
