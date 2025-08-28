@@ -46,7 +46,7 @@ class CreneauHoraire extends Model
      */
     public function emploisDuTemps()
     {
-        return $this->hasMany(EmploiDuTemps::class, 'creneau_id');
+        return $this->hasMany(EmploiDuTemps::class, 'creneau_horaire_id');
     }
 
     /**
