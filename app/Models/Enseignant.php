@@ -68,15 +68,23 @@ class Enseignant extends Model
     }
 
     /**
-     * Obtenir les matières enseignées (relation many-to-many via JSON)
+     * Obtenir les matières enseignées (relation via JSON - retourne une collection)
      */
-    public function matieres()
+    public function getMatieres()
     {
         if (!$this->matieres_enseignees) {
             return collect();
         }
         
         return Matiere::whereIn('id', $this->matieres_enseignees)->get();
+    }
+
+    /**
+     * Accessor pour les matières (pour compatibilité avec les vues)
+     */
+    public function getMatieresAttribute()
+    {
+        return $this->getMatieres();
     }
 
     /**

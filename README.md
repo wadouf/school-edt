@@ -1,61 +1,182 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Institut Polyvalent Bilingue Les Pintades - Système de Gestion d'Emplois du Temps
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🎯 Aperçu du Projet
 
-## About Laravel
+Application web Laravel moderne de gestion des emplois du temps pour un établissement secondaire bilingue (sections francophone et anglophone) au Cameroun. Le système facilite la planification horaire tout en prenant en compte la dualité linguistique et les différentes filières.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🌐 URLs d'Accès
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Production** : https://8000-i53oky8bjajgqdw543exj.e2b.dev
+- **API Base** : https://8000-i53oky8bjajgqdw543exj.e2b.dev/api
+- **Connexion** : https://8000-i53oky8bjajgqdw543exj.e2b.dev/login
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🔐 Identifiants de Connexion
 
-## Learning Laravel
+### Comptes de Démonstration
+- **Administrateur** : `admin@ecole.fr` / `admin123`
+- **Chef d'Établissement** : `chef@ecole.fr` / `chef123`
+- **Enseignant** (exemple) : `j.dupont@ecole.fr` / `password123`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🏗️ Architecture de Données
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Entités Principales
+- **Sections** : Francophone, Anglophone
+- **Niveaux** : 6ème-Terminale (FR), Form1-Upper Sixth (EN)
+- **Filières** : Scientifique, Littéraire, Technique, Arts
+- **Classes** : Combinaison Niveau + Filière + Section
+- **Enseignants** : Permanents et Vacataires avec disponibilités
+- **Matières** : Avec couleurs et types de salle requis
+- **Salles** : Normales, Laboratoires, Informatique, Gymnase
+- **Créneaux Horaires** : 7h30-16h30 avec pauses configurables
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Services de Stockage
+- **PostgreSQL** : Base de données relationnelle principale
+- **Spatie/Permission** : Gestion des rôles et permissions (RBAC)
+- **Laravel Breeze** : Authentification et gestion des sessions
 
-## Laravel Sponsors
+## ✅ Fonctionnalités Implémentées
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Authentification et RBAC ✅
+- [x] Système d'authentification Laravel Breeze
+- [x] Trois rôles : Admin, Chef d'établissement, Enseignant
+- [x] Permissions granulaires par rôle
+- [x] Interface de connexion sécurisée
 
-### Premium Partners
+### Gestion des Ressources ✅
+- [x] Structure complète des données scolaires
+- [x] Seeders de démonstration avec données réalistes
+- [x] Modèles Eloquent avec relations complètes
+- [x] Système de logging des activités
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Structure de Base ✅
+- [x] Migrations PostgreSQL complètes
+- [x] Configuration bilingue (français par défaut)
+- [x] Interface Bootstrap responsive
+- [x] Gestion des créneaux horaires (7h30-16h30)
 
-## Contributing
+## ❌ Fonctionnalités Non Implémentées
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Interface Utilisateur
+- [ ] Tableaux de bord par rôle
+- [ ] CRUD des classes, enseignants, matières, salles
+- [ ] Interface de gestion des disponibilités enseignants
+- [ ] Formulaires de saisie avec validation Bootstrap
 
-## Code of Conduct
+### Emplois du Temps
+- [ ] Interface de création/édition manuelle (drag & drop)
+- [ ] Grille hebdomadaire interactive
+- [ ] Détection automatique des conflits
+- [ ] Génération automatique avec contraintes
+- [ ] Vues par classe, enseignant, salle
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Exports et Rapports
+- [ ] Export PDF des emplois du temps
+- [ ] Export Excel/CSV des données
+- [ ] Export iCal pour synchronisation
+- [ ] Rapports de charge enseignants
 
-## Security Vulnerabilities
+### Fonctionnalités Avancées
+- [ ] Algorithme de génération automatique
+- [ ] Gestion des blocs de 2h consécutives
+- [ ] Contraintes de salles spécialisées
+- [ ] Système de notifications
+- [ ] API REST complète
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🛠️ Stack Technologique
 
-## License
+### Backend
+- **Laravel 12.26.3** (PHP 8.2)
+- **PostgreSQL 15** 
+- **Spatie/Laravel-Permission** (RBAC)
+- **Laravel Breeze** (Authentification)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Frontend
+- **Bootstrap 5** (Framework CSS)
+- **Blade Templates** (Moteur de templates)
+- **Vite** (Build tool)
+- **Tailwind CSS** (Styles utilitaires)
+
+### Packages Intégrés
+- **Spatie/ActivityLog** : Logging des modifications
+- **Barryvdh/DomPDF** : Génération PDF
+- **Maatwebsite/Excel** : Import/Export Excel
+- **Livewire** : Composants interactifs
+
+## 📊 Modèle de Données Simplifié
+
+```
+Users (auth) → Enseignants (profils)
+    ↓
+Sections → Classes ← Niveaux
+    ↓         ↓        ↑
+    ↓    Emplois ← Filières
+    ↓         ↓
+    ↓    Créneaux
+    ↓         ↓
+Matières → Salles
+```
+
+## 🚀 Prochaines Étapes Recommandées
+
+### Phase 1 : Interface de Base (Priorité Haute)
+1. **Tableaux de bord** par rôle avec navigation
+2. **CRUD Classes** : Liste, création, édition, suppression
+3. **CRUD Enseignants** : Avec gestion des matières enseignées
+4. **CRUD Matières et Salles** : Interface de gestion complète
+
+### Phase 2 : Emplois du Temps (Priorité Haute)  
+1. **Grille d'emploi du temps** : Affichage hebdomadaire
+2. **Création manuelle** : Interface drag & drop
+3. **Détection de conflits** : Validation temps réel
+4. **Vues multiples** : Par classe, enseignant, salle
+
+### Phase 3 : Fonctionnalités Avancées
+1. **Génération automatique** : Algorithme de contraintes
+2. **Exports** : PDF, Excel, iCal
+3. **API REST** : Pour intégrations externes
+4. **Optimisations** : Performance et UX
+
+## 📅 État du Déploiement
+
+- **Plateforme** : Sandbox E2B (Développement)
+- **Serveur** : PHP Built-in Server (port 8000)
+- **Status** : ✅ Active avec données de démonstration
+- **Tech Stack** : Laravel + PostgreSQL + Bootstrap 5
+- **Dernière MAJ** : 28 août 2025
+
+## 🎓 Guide d'Utilisation
+
+### Pour l'Administrateur
+1. Se connecter avec `admin@ecole.fr / admin123`
+2. Accès complet à toutes les fonctionnalités
+3. Gestion des utilisateurs et permissions
+4. Configuration globale du système
+
+### Pour le Chef d'Établissement  
+1. Se connecter avec `chef@ecole.fr / chef123`
+2. Gestion pédagogique (classes, emplois du temps)
+3. Validation des demandes enseignants
+4. Génération des rapports
+
+### Pour les Enseignants
+1. Se connecter avec un compte enseignant
+2. Consultation de l'emploi du temps personnel
+3. Saisie des disponibilités
+4. Export calendrier personnel
+
+## 🔧 Configuration Technique
+
+### Base de Données
+- **Host** : localhost (PostgreSQL 15)
+- **Database** : emplois_temps
+- **User** : laravel / laravel123
+
+### Environnement
+- **APP_NAME** : Institut Polyvalent Bilingue Les Pintades
+- **APP_URL** : https://8000-i53oky8bjajgqdw543exj.e2b.dev
+- **APP_LOCALE** : fr (français par défaut)
+
+---
+
+**Développé pour l'Institut Polyvalent Bilingue Les Pintades, Cameroun**  
+*Système de gestion d'emplois du temps bilingue moderne et efficient*
