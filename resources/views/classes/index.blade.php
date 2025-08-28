@@ -590,9 +590,9 @@
                                     </td>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ $classe->nom }}</div>
-                                        @if($classe->salle_attitre)
+                                        @if($classe->salle_principale)
                                             <small class="text-muted">
-                                                <i class="fas fa-door-open me-1"></i>{{ $classe->salle_attitre }}
+                                                <i class="fas fa-door-open me-1"></i>{{ $classe->salle_principale }}
                                             </small>
                                         @endif
                                     </td>
@@ -609,9 +609,9 @@
                                         <span class="text-muted">{{ $classe->filiere->nom ?? 'N/A' }}</span>
                                     </td>
                                     <td>
-                                        @if($classe->effectif_max)
+                                        @if($classe->capacite_max)
                                             <span class="badge bg-info rounded-pill">
-                                                <i class="fas fa-users me-1"></i>{{ $classe->effectif_max }}
+                                                <i class="fas fa-users me-1"></i>{{ $classe->capacite_max }}
                                             </span>
                                         @else
                                             <span class="text-muted">—</span>
@@ -646,38 +646,13 @@
                                             @endcan
                                             @can('delete', $classe)
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-outline-danger" 
+                                                        class="btn btn-sm btn-outline-danger delete-btn" 
                                                         title="Supprimer"
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#deleteModal{{ $classe->id }}">
+                                                        data-classe-id="{{ $classe->id }}"
+                                                        data-classe-nom="{{ $classe->nom }}"
+                                                        data-classe-url="{{ route('classes.destroy', $classe) }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
-
-                                                <!-- Modal de confirmation -->
-                                                <div class="modal fade" id="deleteModal{{ $classe->id }}" tabindex="-1">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Confirmer la Suppression</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p>Êtes-vous sûr de vouloir supprimer la classe <strong>{{ $classe->nom }}</strong> ?</p>
-                                                                <p class="text-muted small">Cette action est irréversible.</p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                                                <form action="{{ route('classes.destroy', $classe) }}" method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="btn btn-danger">
-                                                                        <i class="fas fa-trash me-2"></i>Supprimer
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             @endcan
                                         </div>
                                     </td>
@@ -719,6 +694,47 @@
             </main>
         </div>
 
+        <!-- Modal de confirmation de suppression unique -->
+        <div class="modal fade" id="deleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            Confirmer la Suppression
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex align-items-start">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-trash-alt text-danger fs-2"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="mb-2">Êtes-vous sûr de vouloir supprimer la classe <strong id="classe-nom"></strong> ?</p>
+                                <div class="alert alert-warning small mb-0">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    Cette action est irréversible et supprimera définitivement la classe.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </button>
+                        <form id="delete-form" action="" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Supprimer définitivement
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bootstrap 5 JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         
@@ -757,6 +773,48 @@
                 if (window.innerWidth > 768) {
                     sidebar.classList.remove('show');
                 }
+            });
+
+            // Gestion du modal de suppression performant
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                const deleteForm = document.getElementById('delete-form');
+                const classeNomElement = document.getElementById('classe-nom');
+                
+                // Écouteur pour tous les boutons de suppression
+                document.addEventListener('click', function(e) {
+                    if (e.target.closest('.delete-btn')) {
+                        e.preventDefault();
+                        
+                        const btn = e.target.closest('.delete-btn');
+                        const classeId = btn.dataset.classeId;
+                        const classeNom = btn.dataset.classeNom;
+                        const classeUrl = btn.dataset.classeUrl;
+                        
+                        // Mettre à jour le contenu du modal
+                        classeNomElement.textContent = classeNom;
+                        deleteForm.action = classeUrl;
+                        
+                        // Afficher le modal instantanément
+                        deleteModal.show();
+                    }
+                });
+                
+                // Animation du bouton de suppression lors du hover
+                document.addEventListener('mouseover', function(e) {
+                    if (e.target.closest('.delete-btn')) {
+                        const btn = e.target.closest('.delete-btn');
+                        btn.style.transform = 'scale(1.05)';
+                        btn.style.transition = 'transform 0.15s ease';
+                    }
+                });
+                
+                document.addEventListener('mouseout', function(e) {
+                    if (e.target.closest('.delete-btn')) {
+                        const btn = e.target.closest('.delete-btn');
+                        btn.style.transform = 'scale(1)';
+                    }
+                });
             });
         </script>
     </body>
