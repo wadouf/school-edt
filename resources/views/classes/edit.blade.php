@@ -459,10 +459,15 @@
                                 <select name="niveau_id" id="niveau_id" class="form-select @error('niveau_id') is-invalid @enderror" required>
                                     <option value="">Sélectionner un niveau</option>
                                     @foreach($niveaux as $niveau)
+                                        @php
+                                            // Associer le niveau à sa section basé sur le cycle
+                                            $sectionType = in_array($niveau->cycle, ['Collège', 'Lycée']) ? 'francophone' : 'anglophone';
+                                        @endphp
                                         <option value="{{ $niveau->id }}" 
-                                                data-section="{{ $niveau->section }}"
+                                                data-section="{{ $sectionType }}"
+                                                data-cycle="{{ $niveau->cycle }}"
                                                 {{ (old('niveau_id', $classe->niveau_id) == $niveau->id) ? 'selected' : '' }}>
-                                            {{ $niveau->nom }} ({{ $niveau->code }})
+                                            {{ $niveau->nom }} ({{ $niveau->code }}) - {{ $niveau->cycle }}
                                         </option>
                                     @endforeach
                                 </select>
