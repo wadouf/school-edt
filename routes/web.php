@@ -5,7 +5,12 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Si l'utilisateur est déjà connecté, rediriger vers le dashboard
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    // Sinon, rediriger vers la page de connexion
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
