@@ -1,98 +1,523 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <i class="fas fa-school mr-2"></i> Détails de la Classe: {{ $classe->nom }}
-            </h2>
-            <div class="space-x-2">
-                @can('update', $classe)
-                    <a href="{{ route('classes.edit', $classe) }}" class="btn btn-primary">
-                        <i class="fas fa-edit mr-2"></i> Modifier
-                    </a>
-                @endcan
-                <a href="{{ route('classes.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
-                </a>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institut Polyvalent Bilingue Les Pintades - Détails Classe</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .school-name {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .school-subtitle {
+            font-size: 12px;
+            opacity: 0.7;
+            margin: 0;
+        }
+
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            margin: 0 1.5rem 0.75rem;
+        }
+
+        .nav-item {
+            margin: 2px 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title i {
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5b6470;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-area {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="school-name">Institut Les Pintades</h1>
+                    <p class="school-subtitle">Gestion des Emplois du Temps</p>
+                </div>
             </div>
         </div>
-    </x-slot>
+        
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <h6 class="nav-section-title">Tableau de Bord</h6>
+                <div class="nav-item">
+                    <a href="{{ route('dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h6 class="nav-section-title">Gestion Pédagogique</h6>
+                <div class="nav-item">
+                    <a href="{{ route('classes.index') }}" class="nav-link active">
+                        <i class="fas fa-users nav-icon"></i>
+                        Classes
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chalkboard-teacher nav-icon"></i>
+                        Enseignants
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-book nav-icon"></i>
+                        Matières
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-door-open nav-icon"></i>
+                        Salles
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h6 class="nav-section-title">Emplois du Temps</h6>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        Emplois du Temps
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-clock nav-icon"></i>
+                        Créneaux Horaires
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Informations principales -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <!-- Détails de base -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-4">Informations de Base</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Nom</label>
-                                    <div class="mt-1 text-lg text-gray-900">{{ $classe->nom }}</div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <h1 class="page-title">
+                <i class="fas fa-school"></i>
+                Détails de la Classe : {{ $classe->nom }}
+            </h1>
+            <div class="user-info">
+                <div class="user-avatar">
+                    {{ substr(auth()->user()->name, 0, 1) }}
+                </div>
+                <div>
+                    <div style="font-weight: 500;">{{ auth()->user()->name }}</div>
+                    <div style="font-size: 12px; color: #6b7280;">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'Utilisateur') }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-area">
+            <!-- Actions Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div></div>
+                <div class="d-flex gap-2">
+                    @can('update', $classe)
+                        <a href="{{ route('classes.edit', $classe) }}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                    @endcan
+                    <a href="{{ route('classes.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Info and Stats -->
+            <div class="row">
+                <!-- Informations principales -->
+                <div class="col-lg-8">
+                    <div class="info-card">
+                        <h3 style="margin-bottom: 1.5rem; font-weight: 600; color: #1f2937;">
+                            <i class="fas fa-info-circle me-2" style="color: var(--primary-color);"></i>
+                            Informations de Base
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <span class="info-label">Nom :</span>
+                                    <span class="info-value">{{ $classe->nom }}</span>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Code</label>
-                                    <div class="mt-1">
-                                        <span class="font-mono text-lg bg-gray-100 px-3 py-1 rounded">{{ $classe->code }}</span>
-                                    </div>
+                                <div class="info-row">
+                                    <span class="info-label">Code :</span>
+                                    <span class="info-value">
+                                        <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-family: monospace;">{{ $classe->code }}</code>
+                                    </span>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Section</label>
-                                    <div class="mt-1">
-                                        <span class="badge {{ $classe->section->nom === 'Francophone' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' }}">
+                                <div class="info-row">
+                                    <span class="info-label">Section :</span>
+                                    <span class="info-value">
+                                        <span class="badge {{ $classe->section->nom === 'Francophone' ? 'badge-info' : 'badge-danger' }}">
                                             {{ $classe->section->nom }}
                                         </span>
-                                    </div>
-                                    <div class="text-sm text-gray-500">{{ $classe->section->description }}</div>
+                                    </span>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Niveau</label>
-                                    <div class="mt-1 text-gray-900">{{ $classe->niveau->nom }}</div>
-                                    <div class="text-sm text-gray-500">Code: {{ $classe->niveau->code }}</div>
+                                <div class="info-row">
+                                    <span class="info-label">Niveau :</span>
+                                    <span class="info-value">{{ $classe->niveau->nom }} ({{ $classe->niveau->code }})</span>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Filière</label>
-                                    <div class="mt-1 text-gray-900">{{ $classe->filiere->nom }}</div>
-                                    <div class="text-sm text-gray-500">Code: {{ $classe->filiere->code }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <span class="info-label">Filière :</span>
+                                    <span class="info-value">{{ $classe->filiere->nom }} ({{ $classe->filiere->code }})</span>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Effectif Maximum</label>
-                                    <div class="mt-1 text-gray-900">
-                                        @if($classe->effectif_max)
-                                            {{ $classe->effectif_max }} élèves
+                                <div class="info-row">
+                                    <span class="info-label">Capacité Max :</span>
+                                    <span class="info-value">
+                                        @if($classe->capacite_max)
+                                            {{ $classe->capacite_max }} élèves
                                         @else
-                                            <span class="text-gray-400">Non défini</span>
+                                            <span style="color: #6b7280;">Non défini</span>
                                         @endif
-                                    </div>
+                                    </span>
                                 </div>
-                                
-                                @if($classe->salle_attitre)
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Salle Attitrée</label>
-                                        <div class="mt-1 text-gray-900">{{ $classe->salle_attitre }}</div>
-                                    </div>
+                                @if($classe->salle_principale)
+                                <div class="info-row">
+                                    <span class="info-label">Salle Principale :</span>
+                                    <span class="info-value">{{ $classe->salle_principale }}</span>
+                                </div>
                                 @endif
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Statut</label>
-                                    <div class="mt-1">
+                                <div class="info-row">
+                                    <span class="info-label">Statut :</span>
+                                    <span class="info-value">
                                         @if($classe->actif)
-                                            <span class="badge bg-green-100 text-green-800">
-                                                <i class="fas fa-check-circle mr-1"></i>Active
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check-circle me-1"></i>Active
                                             </span>
                                         @else
-                                            <span class="badge bg-gray-100 text-gray-800">
-                                                <i class="fas fa-pause-circle mr-1"></i>Inactive
+                                            <span class="badge badge-warning">
+                                                <i class="fas fa-pause-circle me-1"></i>Inactive
                                             </span>
                                         @endif
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -100,38 +525,44 @@
                 </div>
 
                 <!-- Statistiques -->
-                <div>
-                    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-4">Statistiques</h3>
-                            
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Emplois du temps</span>
-                                    <span class="text-2xl font-bold text-blue-600">{{ $stats['emplois_count'] }}</span>
-                                </div>
-                                
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Heures/semaine</span>
-                                    <span class="text-2xl font-bold text-green-600">{{ $stats['heures_semaine'] }}</span>
-                                </div>
-                                
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Matières</span>
-                                    <span class="text-2xl font-bold text-purple-600">{{ $stats['matieres_count'] }}</span>
-                                </div>
-                                
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Enseignants</span>
-                                    <span class="text-2xl font-bold text-orange-600">{{ $stats['enseignants_count'] }}</span>
+                <div class="col-lg-4">
+                    <div class="info-card">
+                        <h3 style="margin-bottom: 1.5rem; font-weight: 600; color: #1f2937;">
+                            <i class="fas fa-chart-bar me-2" style="color: var(--success-color);"></i>
+                            Statistiques
+                        </h3>
+                        
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="text-center p-3" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 8px; color: white;">
+                                    <div class="stat-number">{{ $stats['emplois_count'] }}</div>
+                                    <div class="stat-label">Emplois</div>
                                 </div>
                             </div>
-
-                            <div class="mt-6 pt-4 border-t">
-                                <div class="text-xs text-gray-500 space-y-1">
-                                    <div><strong>Créée:</strong> {{ $classe->created_at->format('d/m/Y') }}</div>
-                                    <div><strong>Modifiée:</strong> {{ $classe->updated_at->format('d/m/Y') }}</div>
+                            <div class="col-6">
+                                <div class="text-center p-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; color: white;">
+                                    <div class="stat-number">{{ $stats['heures_semaine'] }}</div>
+                                    <div class="stat-label">Heures/sem</div>
                                 </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-3" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 8px; color: white;">
+                                    <div class="stat-number">{{ $stats['matieres_count'] }}</div>
+                                    <div class="stat-label">Matières</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-3" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; color: white;">
+                                    <div class="stat-number">{{ $stats['enseignants_count'] }}</div>
+                                    <div class="stat-label">Enseignants</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280;">
+                                <div><strong>Créée:</strong> {{ $classe->created_at->format('d/m/Y à H:i') }}</div>
+                                <div><strong>Modifiée:</strong> {{ $classe->updated_at->format('d/m/Y à H:i') }}</div>
                             </div>
                         </div>
                     </div>
@@ -139,151 +570,86 @@
             </div>
 
             <!-- Emploi du temps de la classe -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold">Emploi du Temps</h3>
-                        <div class="space-x-2">
-                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-plus mr-1"></i> Ajouter un Créneau
-                            </a>
-                            <a href="#" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-download mr-1"></i> Exporter PDF
-                            </a>
-                        </div>
+            <div class="info-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 style="margin: 0; font-weight: 600; color: #1f2937;">
+                        <i class="fas fa-calendar-alt me-2" style="color: var(--success-color);"></i>
+                        Emploi du Temps
+                    </h3>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-success btn-sm">
+                            <i class="fas fa-plus me-1"></i> Ajouter Créneau
+                        </a>
+                        <a href="#" class="btn btn-primary btn-sm">
+                            <i class="fas fa-download me-1"></i> Exporter PDF
+                        </a>
                     </div>
-
-                    @if($classe->emploisDuTemps->count() > 0)
-                        <!-- Grille par jour -->
-                        @php
-                            $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
-                            $emploisParJour = $classe->emploisDuTemps->groupBy('jour_semaine');
-                        @endphp
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                            @foreach([1,2,3,4,5] as $jourIndex)
-                                <div class="border rounded-lg p-3">
-                                    <h4 class="font-semibold text-center mb-3 text-gray-700 bg-gray-50 py-2 rounded">
-                                        {{ $jours[$jourIndex-1] }}
-                                    </h4>
-                                    @if(isset($emploisParJour[$jourIndex]))
-                                        <div class="space-y-2">
-                                            @foreach($emploisParJour[$jourIndex] as $emploi)
-                                                <div class="p-2 rounded text-xs border-l-4" style="border-left-color: {{ $emploi->matiere->couleur ?? '#6B7280' }}; background-color: {{ $emploi->matiere->couleur ?? '#6B7280' }}10;">
-                                                    <div class="font-semibold text-gray-800">{{ $emploi->matiere->nom ?? 'Matière' }}</div>
-                                                    <div class="text-gray-600">{{ $emploi->enseignant->nom ?? 'Enseignant' }}</div>
-                                                    <div class="text-gray-500">{{ $emploi->salle->nom ?? 'Salle' }}</div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <p class="text-gray-400 text-xs text-center py-4">Aucun cours</p>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Liste détaillée -->
-                        <div class="overflow-x-auto">
-                            <table class="table table-striped w-full">
-                                <thead>
-                                    <tr>
-                                        <th>Jour</th>
-                                        <th>Heure</th>
-                                        <th>Matière</th>
-                                        <th>Enseignant</th>
-                                        <th>Salle</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($classe->emploisDuTemps as $emploi)
-                                        <tr>
-                                            <td>{{ $jours[$emploi->jour_semaine - 1] ?? 'N/A' }}</td>
-                                            <td>
-                                                @if($emploi->creneauHoraire)
-                                                    {{ $emploi->creneauHoraire->heure_debut }} - {{ $emploi->creneauHoraire->heure_fin }}
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ $emploi->matiere->couleur ?? '#6B7280' }}"></div>
-                                                    {{ $emploi->matiere->nom ?? 'N/A' }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {{ $emploi->enseignant->prenom ?? 'N/A' }} 
-                                                {{ $emploi->enseignant->nom ?? '' }}
-                                            </td>
-                                            <td>{{ $emploi->salle->nom ?? 'N/A' }}</td>
-                                            <td>
-                                                <div class="flex space-x-1">
-                                                    <a href="#" class="btn btn-sm btn-outline-warning" title="Modifier">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-sm btn-outline-danger" title="Supprimer">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="fas fa-calendar-times text-4xl mb-4"></i>
-                            <p class="text-lg">Aucun emploi du temps configuré</p>
-                            <p class="text-sm">Les créneaux horaires apparaîtront ici une fois configurés</p>
-                        </div>
-                    @endif
                 </div>
+
+                @if($classe->emploisDuTemps->count() > 0)
+                    <!-- Tableau des créneaux -->
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead style="background: #f8fafc;">
+                                <tr>
+                                    <th>Jour</th>
+                                    <th>Heure</th>
+                                    <th>Matière</th>
+                                    <th>Enseignant</th>
+                                    <th>Salle</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $jours = ['', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'] @endphp
+                                @foreach($classe->emploisDuTemps as $emploi)
+                                    <tr>
+                                        <td><strong>{{ $jours[$emploi->jour_semaine] ?? 'N/A' }}</strong></td>
+                                        <td>
+                                            @if($emploi->creneauHoraire)
+                                                <code>{{ $emploi->creneauHoraire->heure_debut }} - {{ $emploi->creneauHoraire->heure_fin }}</code>
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ $emploi->matiere->couleur ?? '#6b7280' }}; margin-right: 8px;"></div>
+                                                {{ $emploi->matiere->nom ?? 'N/A' }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{ $emploi->enseignant->prenom ?? 'N/A' }} 
+                                            {{ $emploi->enseignant->nom ?? '' }}
+                                        </td>
+                                        <td>{{ $emploi->salle->nom ?? 'N/A' }}</td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <button class="btn btn-warning btn-sm" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-5" style="color: #6b7280;">
+                        <i class="fas fa-calendar-times" style="font-size: 4rem; margin-bottom: 1rem; color: #d1d5db;"></i>
+                        <h4>Aucun emploi du temps configuré</h4>
+                        <p>Les créneaux horaires apparaîtront ici une fois configurés</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 
-    <style>
-        .btn {
-            @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200;
-        }
-        .btn-primary {
-            @apply bg-blue-600 text-white hover:bg-blue-700;
-        }
-        .btn-secondary {
-            @apply bg-gray-600 text-white hover:bg-gray-700;
-        }
-        .btn-outline-primary {
-            @apply border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white;
-        }
-        .btn-outline-success {
-            @apply border border-green-600 text-green-600 hover:bg-green-600 hover:text-white;
-        }
-        .btn-outline-warning {
-            @apply border border-yellow-500 text-yellow-600 hover:bg-yellow-500 hover:text-white;
-        }
-        .btn-outline-danger {
-            @apply border border-red-600 text-red-600 hover:bg-red-600 hover:text-white;
-        }
-        .btn-sm {
-            @apply px-2 py-1 text-xs;
-        }
-        .table {
-            @apply w-full text-sm text-left;
-        }
-        .table-striped tbody tr:nth-child(odd) {
-            @apply bg-gray-50;
-        }
-        .table th {
-            @apply px-4 py-3 font-semibold text-gray-700 bg-gray-100;
-        }
-        .table td {
-            @apply px-4 py-3 text-gray-600;
-        }
-        .badge {
-            @apply inline-block px-2 py-1 text-xs font-semibold rounded-full;
-        }
-    </style>
-</x-app-layout>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
