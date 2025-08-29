@@ -6,6 +6,7 @@ use App\Models\Classe;
 use App\Models\Section;
 use App\Models\Niveau;
 use App\Models\Filiere;
+use App\Models\Salle;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -62,8 +63,9 @@ class ClasseController extends Controller
         $sections = Section::all();
         $niveaux = Niveau::all();
         $filieres = Filiere::all();
+        $salles = Salle::disponible()->orderBy('nom')->get();
 
-        return view('classes.create', compact('sections', 'niveaux', 'filieres'));
+        return view('classes.create', compact('sections', 'niveaux', 'filieres', 'salles'));
     }
 
     /**
@@ -80,7 +82,7 @@ class ClasseController extends Controller
             'nom' => 'required|string|max:255',
             'code' => 'nullable|string|max:10|unique:classes,code',
             'capacite_max' => 'nullable|integer|min:1|max:50',
-            'salle_principale' => 'nullable|string|max:255',
+            'salle_principale_id' => 'nullable|exists:salles,id',
             'actif' => 'boolean',
         ]);
 
@@ -127,8 +129,9 @@ class ClasseController extends Controller
         $sections = Section::all();
         $niveaux = Niveau::all();
         $filieres = Filiere::all();
+        $salles = Salle::disponible()->orderBy('nom')->get();
 
-        return view('classes.edit', compact('classe', 'sections', 'niveaux', 'filieres'));
+        return view('classes.edit', compact('classe', 'sections', 'niveaux', 'filieres', 'salles'));
     }
 
     /**
@@ -145,7 +148,7 @@ class ClasseController extends Controller
             'nom' => 'required|string|max:255',
             'code' => 'nullable|string|max:10|unique:classes,code,' . $classe->id,
             'capacite_max' => 'nullable|integer|min:1|max:50',
-            'salle_principale' => 'nullable|string|max:255',
+            'salle_principale_id' => 'nullable|exists:salles,id',
             'actif' => 'boolean',
         ]);
 

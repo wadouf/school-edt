@@ -20,6 +20,7 @@ class Classe extends Model
         'effectif',
         'capacite_max',
         'salle_principale',
+        'salle_principale_id',
         'professeur_principal',
         'actif',
         'notes',
@@ -62,6 +63,14 @@ class Classe extends Model
     public function section()
     {
         return $this->belongsTo(Section::class);
+    }
+
+    /**
+     * Relation avec la salle principale
+     */
+    public function sallePrincipale()
+    {
+        return $this->belongsTo(Salle::class, 'salle_principale_id');
     }
 
     /**

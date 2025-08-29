@@ -540,15 +540,27 @@
                         <!-- Salle Principale -->
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="salle_principale" class="form-label">
+                                <label for="salle_principale_id" class="form-label">
                                     Salle Principale (optionnel)
                                 </label>
-                                <input type="text" name="salle_principale" id="salle_principale" 
-                                       value="{{ old('salle_principale') }}" placeholder="Ex: Salle 101, Lab Sciences..."
-                                       class="form-control @error('salle_principale') is-invalid @enderror">
-                                @error('salle_principale')
+                                <select name="salle_principale_id" id="salle_principale_id" class="form-select @error('salle_principale_id') is-invalid @enderror">
+                                    <option value="">Aucune salle assignée</option>
+                                    @foreach($salles as $salle)
+                                        <option value="{{ $salle->id }}" 
+                                                data-capacite="{{ $salle->capacite }}"
+                                                data-type="{{ $salle->type }}"
+                                                {{ old('salle_principale_id') == $salle->id ? 'selected' : '' }}>
+                                            {{ $salle->nom }} ({{ $salle->code }}) - Cap: {{ $salle->capacite }} - {{ ucfirst($salle->type) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('salle_principale_id')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    Sélectionnez la salle où la classe aura principalement cours
+                                </small>
                             </div>
                         </div>
                     </div>
